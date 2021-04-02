@@ -1889,13 +1889,38 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   props: {
     url: String
   },
   data: function data() {
     return {
-      allNewsData: []
+      allNewsData: [],
+      selectKey: "",
+      selectCountryKey: ""
     };
   },
   mounted: function mounted() {
@@ -1907,19 +1932,29 @@ __webpack_require__.r(__webpack_exports__);
 
       axios.get('/api/get-news').then(function (response) {
         var newsData = response.data;
-        console.log(response.data);
         _this.allNewsData = newsData;
       });
     },
-    detail: function detail(id) {},
-    likeNews: function likeNews(url) {
-      axios.get('/api/like-news/' + url).then(function (response) {
-        console.log(response);
+    getNewsFromSource: function getNewsFromSource(event) {
+      var _this2 = this;
+
+      var sourceData = event.target.value;
+      axios.post('/api/sourceId', {
+        source: sourceData
+      }).then(function (response) {
+        var sourceData = response.data;
+        _this2.allNewsData = sourceData;
       });
     },
-    dislikeNews: function dislikeNews() {
-      axios.get('/api/dislike-news/' + url).then(function (response) {
-        console.log(response);
+    getNewsFromCountry: function getNewsFromCountry(event) {
+      var _this3 = this;
+
+      var country = event.target.value;
+      axios.post('/api/get-by-country', {
+        country: country
+      }).then(function (response) {
+        var sourceData = response.data;
+        _this3.allNewsData = sourceData;
       });
     }
   }
@@ -1955,15 +1990,63 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   props: {},
   data: function data() {
     return {
-      allNewsData: []
+      singleNewsData: {},
+      likes: 0,
+      disLikes: 0
     };
   },
-  mounted: function mounted() {},
-  methods: {}
+  created: function created() {},
+  mounted: function mounted() {
+    this.singleNewsData = this.$route.params.news;
+    this.getNewsInfo();
+  },
+  methods: {
+    getNewsInfo: function getNewsInfo() {
+      var _this = this;
+
+      axios.post("/api/get-news-likes-info", {
+        url: this.$route.params.news.url
+      }).then(function (response) {
+        _this.likes = response.data.like_count;
+        _this.disLikes = response.data.dislike_count;
+      });
+    },
+    likeNews: function likeNews(newsUrl) {
+      var _this2 = this;
+
+      axios.post("/api/like-news", {
+        url: newsUrl
+      }).then(function (response) {
+        _this2.likes = response.data.like_count;
+      });
+    },
+    dislikeNews: function dislikeNews(newsUrl) {
+      var _this3 = this;
+
+      axios.post("/api/dislike-news", {
+        url: newsUrl
+      }).then(function (response) {
+        _this3.disLikes = response.data.dislike_count;
+      });
+    }
+  }
 });
 
 /***/ }),
@@ -1992,6 +2075,7 @@ var routes = [{
   component: __webpack_require__(/*! ./components/NewsComponent.vue */ "./resources/js/components/NewsComponent.vue").default
 }, {
   path: '/news-detail',
+  name: 'news.detail',
   component: __webpack_require__(/*! ./components/NewsDetailComponent.vue */ "./resources/js/components/NewsDetailComponent.vue").default
 }];
 var router = new vue_router__WEBPACK_IMPORTED_MODULE_0__.default({
@@ -37613,45 +37697,164 @@ var render = function() {
   return _c("div", { staticClass: "container" }, [
     _vm._m(0),
     _vm._v(" "),
-    _c(
-      "section",
-      { staticClass: "section-dropdown", attrs: { id: "content" } },
-      [
-        _c("p", { staticClass: "select-header" }, [
-          _vm._v(" Select a news source: ")
-        ]),
-        _vm._v(" "),
-        _c("label", { staticClass: "select" }, [
-          _c(
-            "select",
-            { attrs: { name: "news_sources", id: "news_sources" } },
-            [
-              _c("option", { domProps: { value: _vm.allNewsData.sourceId } }, [
-                _vm._v(_vm._s(_vm.allNewsData.sourceName))
-              ]),
-              _vm._v(" "),
-              _vm._l(_vm.allNewsData.newsSource, function(newsSource) {
-                return _c(
-                  "option",
-                  { key: newsSource.id, domProps: { value: newsSource.id } },
-                  [_vm._v(_vm._s(newsSource.name))]
-                )
-              })
-            ],
-            2
-          )
-        ]),
-        _vm._v(" "),
-        _c("object", {
-          attrs: {
-            id: "spinner",
-            data: "spinner.svg",
-            type: "image/svg+xml",
-            hidden: ""
-          }
-        })
-      ]
-    ),
+    _c("div", { staticClass: "row" }, [
+      _c("div", { staticClass: "col-md-6" }, [
+        _c(
+          "section",
+          { staticClass: "section-dropdown", attrs: { id: "content" } },
+          [
+            _c("p", { staticClass: "select-header" }, [
+              _vm._v(" Select a news source: ")
+            ]),
+            _vm._v(" "),
+            _c("label", { staticClass: "select" }, [
+              _c(
+                "select",
+                {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.selectKey,
+                      expression: "selectKey"
+                    }
+                  ],
+                  attrs: { name: "news_sources", id: "news_sources" },
+                  on: {
+                    change: [
+                      function($event) {
+                        var $$selectedVal = Array.prototype.filter
+                          .call($event.target.options, function(o) {
+                            return o.selected
+                          })
+                          .map(function(o) {
+                            var val = "_value" in o ? o._value : o.value
+                            return val
+                          })
+                        _vm.selectKey = $event.target.multiple
+                          ? $$selectedVal
+                          : $$selectedVal[0]
+                      },
+                      function($event) {
+                        return _vm.getNewsFromSource($event)
+                      }
+                    ]
+                  }
+                },
+                [
+                  _c(
+                    "option",
+                    {
+                      domProps: {
+                        value:
+                          _vm.allNewsData.sourceId +
+                          ":" +
+                          _vm.allNewsData.sourceName
+                      }
+                    },
+                    [_vm._v(_vm._s(_vm.allNewsData.sourceName))]
+                  ),
+                  _vm._v(" "),
+                  _vm._l(_vm.allNewsData.newsSources, function(newsSource) {
+                    return _c(
+                      "option",
+                      {
+                        key: newsSource.id,
+                        domProps: {
+                          value: newsSource.id + ":" + newsSource.name
+                        }
+                      },
+                      [_vm._v(_vm._s(newsSource.name))]
+                    )
+                  })
+                ],
+                2
+              )
+            ]),
+            _vm._v(" "),
+            _c("object", {
+              attrs: {
+                id: "spinner",
+                data: "spinner.svg",
+                type: "image/svg+xml",
+                hidden: ""
+              }
+            })
+          ]
+        )
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "col-md-6" }, [
+        _c(
+          "section",
+          { staticClass: "section-dropdown", attrs: { id: "content" } },
+          [
+            _c("p", { staticClass: "select-header" }, [
+              _vm._v(" Select a country: ")
+            ]),
+            _vm._v(" "),
+            _c("label", { staticClass: "select" }, [
+              _c(
+                "select",
+                {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.selectCountryKey,
+                      expression: "selectCountryKey"
+                    }
+                  ],
+                  attrs: { name: "news_sources", id: "news_sources" },
+                  on: {
+                    change: [
+                      function($event) {
+                        var $$selectedVal = Array.prototype.filter
+                          .call($event.target.options, function(o) {
+                            return o.selected
+                          })
+                          .map(function(o) {
+                            var val = "_value" in o ? o._value : o.value
+                            return val
+                          })
+                        _vm.selectCountryKey = $event.target.multiple
+                          ? $$selectedVal
+                          : $$selectedVal[0]
+                      },
+                      function($event) {
+                        return _vm.getNewsFromCountry($event)
+                      }
+                    ]
+                  }
+                },
+                [
+                  _c("option", { attrs: { value: "us" } }, [_vm._v("U.S")]),
+                  _vm._v(" "),
+                  _c("option", { attrs: { value: "tr" } }, [_vm._v("Turkey")]),
+                  _vm._v(" "),
+                  _c("option", { attrs: { value: "sg" } }, [
+                    _vm._v("Singapore")
+                  ]),
+                  _vm._v(" "),
+                  _c("option", { attrs: { value: "ph" } }, [
+                    _vm._v("Philippines")
+                  ])
+                ]
+              )
+            ]),
+            _vm._v(" "),
+            _c("object", {
+              attrs: {
+                id: "spinner",
+                data: "spinner.svg",
+                type: "image/svg+xml",
+                hidden: ""
+              }
+            })
+          ]
+        )
+      ])
+    ]),
     _vm._v(" "),
     _c("div", { attrs: { id: "news" } }, [
       _c("p", [
@@ -37673,7 +37876,7 @@ var render = function() {
                 _c(
                   "a",
                   { attrs: { href: selectedNews.url, target: "_blank" } },
-                  [_c("small", [_vm._v("read more...")])]
+                  [_c("small", [_vm._v("read from source...")])]
                 )
               ]),
               _vm._v(" "),
@@ -37683,7 +37886,9 @@ var render = function() {
                 [
                   _vm._v(
                     "\n                        Author: " +
-                      _vm._s(selectedNews.author ? "" : "Unknown") +
+                      _vm._s(
+                        selectedNews.author ? selectedNews.author : "Unknown"
+                      ) +
                       "\n                    "
                   )
                 ]
@@ -37708,7 +37913,12 @@ var render = function() {
                     "router-link",
                     {
                       staticClass: "btn btn-primary",
-                      attrs: { to: "/news-detail" }
+                      attrs: {
+                        to: {
+                          name: "news.detail",
+                          params: { news: selectedNews }
+                        }
+                      }
                     },
                     [_vm._v("VIEW")]
                   )
@@ -37764,26 +37974,91 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _vm._m(0)
-}
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "container" }, [
-      _c("div", { staticClass: "row justify-content-center" }, [
-        _c("div", { staticClass: "col-md-8" }, [
-          _c("div", { staticClass: "card" }, [
-            _c("div", { staticClass: "card-header" }, [_vm._v("Title")]),
+  return _c("div", { staticClass: "container" }, [
+    _c("div", { staticClass: "row justify-content-center" }, [
+      _c(
+        "div",
+        { staticClass: "col-md-8 mt-5" },
+        [
+          _c(
+            "router-link",
+            { staticClass: "btn btn-success", attrs: { to: "/" } },
+            [_vm._v("Go Back")]
+          ),
+          _vm._v(" "),
+          _c("div", { staticClass: "col-md-12" }, [
+            _c("h1", [_vm._v(_vm._s(_vm.singleNewsData.title))]),
             _vm._v(" "),
-            _c("div", { staticClass: "card-body" }, [_c("br")])
+            _c("div", { staticClass: "container" }, [
+              _c("img", {
+                attrs: {
+                  src: _vm.singleNewsData.urlToImage,
+                  alt: "",
+                  height: "400",
+                  width: "400"
+                }
+              })
+            ]),
+            _vm._v(" "),
+            _c("p", { staticClass: "m-5" }, [
+              _vm._v(
+                "\n          " +
+                  _vm._s(_vm.singleNewsData.description) +
+                  "\n        "
+              )
+            ]),
+            _vm._v(" "),
+            _c("div", [
+              _c("span", { staticClass: "badge" }, [
+                _vm._v("Posted 2012-08-02 20:47:04")
+              ]),
+              _vm._v(" "),
+              _c("span", { staticClass: "label label-info" }, [
+                _vm._v(_vm._s(_vm.likes) + " Likes")
+              ]),
+              _vm._v(" "),
+              _c("span", { staticClass: "label label-warning" }, [
+                _vm._v(_vm._s(_vm.disLikes) + " Dislikes")
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "pull-right" }, [
+                _c(
+                  "span",
+                  {
+                    staticClass: "btn btn-default",
+                    on: {
+                      click: function($event) {
+                        return _vm.likeNews(_vm.singleNewsData.url)
+                      }
+                    }
+                  },
+                  [_vm._v("Like")]
+                ),
+                _vm._v(" "),
+                _c(
+                  "span",
+                  {
+                    staticClass: "btn btn-danger",
+                    on: {
+                      click: function($event) {
+                        return _vm.dislikeNews(_vm.singleNewsData.url)
+                      }
+                    }
+                  },
+                  [_vm._v("Dislike")]
+                )
+              ])
+            ]),
+            _vm._v(" "),
+            _c("hr")
           ])
-        ])
-      ])
+        ],
+        1
+      )
     ])
-  }
-]
+  ])
+}
+var staticRenderFns = []
 render._withStripped = true
 
 

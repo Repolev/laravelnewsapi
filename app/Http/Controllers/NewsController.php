@@ -12,7 +12,7 @@ class NewsController extends Controller
      * @param Request $request
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function displayNews(Request $request)
+    public function home(Request $request)
     {
         $response = $this->determineMethodHandler($request);
         $apiModel = new NewsApi();
@@ -59,6 +59,19 @@ class NewsController extends Controller
         $response = $this->determineMethodHandler($request);
         $apiModel = new NewsApi();
         $response['news'] = $apiModel->fetchNewsFromSource($response['sourceId']);
+        $response['newsSources'] = $this->fetchAllNewsSources();
+        return json_encode($response);
+    }
+
+
+    /**
+     * Get News from Country
+     */
+    public function getNewsFromCountry(Request $request)
+    {
+        $response = $this->determineMethodHandler($request);
+        $apiModel = new NewsApi();
+        $response['news'] = $apiModel->fetchNewsFromSource($response['country']);
         $response['newsSources'] = $this->fetchAllNewsSources();
         return json_encode($response);
     }

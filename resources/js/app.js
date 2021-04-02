@@ -17,6 +17,7 @@ const routes = [
     },
     {
         path: '/news-detail',
+        name: 'news.detail',
         component: require('./components/NewsDetailComponent.vue').default,
     },
 ];

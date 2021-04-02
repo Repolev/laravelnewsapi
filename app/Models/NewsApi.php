@@ -22,6 +22,18 @@ class NewsApi extends Model
         $response = (new Helper)->makeApiCalls($urlParams);
         return Arr::get($response,'articles');
     }
+
+    /**
+     * @param $newsSource
+     * @return mixed
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function fetchNewsFromCountry($country)
+    {
+        $urlParams = 'top-headlines?country=' . $country;
+        $response = (new Helper)->makeApiCalls($urlParams);
+        return Arr::get($response,'articles');
+    }
     /**
      * @return mixed
      * @throws \GuzzleHttp\Exception\GuzzleException
