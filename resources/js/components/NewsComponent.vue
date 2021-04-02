@@ -32,8 +32,8 @@
                             Published: {{ selectedNews.publishedAt }}</div>
                         <div style="padding-top: 5px;" v-else>Date Published: Unknown</div>
                         <div style="padding-top: 5px;">
-                            <button class="btn btn-primary" v-on:click="likeNews">LIKE</button>
-                            <button class="btn btn-danger" v-on:click="dislikeNews">DISLIKE</button>
+                            <!-- <a v-bind:href="url" class="btn btn-primary">VIEW</a> -->
+                            <router-link to="/news-detail" class="btn btn-primary">VIEW</router-link>
                         </div>
                     </div>
                 </article>
@@ -44,6 +44,9 @@
 
 <script>
     export default {
+        props: {
+            url: String,
+        },
         data() {
             return {
                 allNewsData: [],
@@ -57,8 +60,8 @@
                 axios.get('/api/get-news')
                     .then((response) => {
                         let newsData = response.data;
+                        console.log(response.data);
                         this.allNewsData = newsData;
-                        console.log(newsData);
                     });
             },
             detail(id) {
@@ -70,7 +73,9 @@
                 })
             },
             dislikeNews(){
-
+                axios.get('/api/dislike-news/' + url).then((response) => {
+                    console.log(response);
+                })
             }
         }
     }

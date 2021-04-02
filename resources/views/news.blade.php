@@ -18,7 +18,7 @@
  </head>
  <body>
     <div id="app">
-        <news-component>
+        <router-view></router-view>
     </div>
 
  </body>

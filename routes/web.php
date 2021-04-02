@@ -22,4 +22,5 @@ Auth::routes();
 // Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 Route::get('/', 'App\Http\Controllers\NewsController@displayNews');
 Route::get('/news', 'App\Http\Controllers\NewsController@fetchNews');
+Route::get('/news-detail', 'App\Http\Controllers\NewsController@fetchNewsDetail')->name('newsDetail');
 Route::post('/sourceId', 'App\Http\Controllers\NewsController@displayNews');
