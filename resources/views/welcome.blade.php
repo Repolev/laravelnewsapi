@@ -11,6 +11,7 @@
 
      <!-- Styles -->
      <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+     <link href="{{ asset('css/style.css') }}" rel="stylesheet">
      <!-- Latest compiled and minified CSS -->
      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 
@@ -37,10 +38,8 @@
      <div id="news">
          <p> News Source : {{$sourceName}} </p>
 
-
          <section class="news">
              @foreach($news as $selectedNews)
-
                  <article>
                      <img src="{{$selectedNews['urlToImage']}}" alt=""/>
                      <div class="text">
@@ -75,5 +74,7 @@
  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
  <!-- Scripts -->
  <script src="{{ asset('js/site.js') }}"></script>
+ <script src="{{ asset('js/main.js') }}"></script>
+ <script src="{{ asset('js/app.js') }}"></script>
 
  </html>

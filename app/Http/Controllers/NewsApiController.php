@@ -4,9 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\NewsApi;
+use App\Models\NewsLike;
 use Illuminate\Support\Facades\Cache;
 
-class NewsController extends Controller
+class NewsApiController extends Controller
 {
     /**
      * @param Request $request
@@ -18,7 +19,7 @@ class NewsController extends Controller
         $apiModel = new NewsApi();
         $response['news'] = $apiModel->fetchNewsFromSource($response['sourceId']);
         $response['newsSources'] = $this->fetchAllNewsSources();
-        return view('welcome', $response);
+        return response()->json($response);
     }
     /**
      * @param $request
@@ -64,10 +65,47 @@ class NewsController extends Controller
     }
 
     /**
-     * Fetch News
+     * Like News
      */
-    public function fetchNews()
+    public function likeNews($url)
     {
-        return view('news');
+        $get_like = NewsLike::where('url', $url)->first();
+        if($get_like) {
+            $get_like->like_count = $get_like->like_count + 1;
+            $get_like->save();
+        } else {
+            $create_news_like = NewsLike::create([
+                'url' => $url,
+                'like_count' => 1,
+                'dislike_count' => 0,
+            ]);
+        }
+    }
+
+    /**
+     * Dis Like News
+     */
+    public function dislikeNews($url)
+    {
+        $get_like = NewsLike::where('url', $url)->first();
+        if($get_like) {
+            $get_like->dislike_count = $get_like->dislike_count + 1;
+            $get_like->save();
+        } else {
+            $create_news_like = NewsLike::create([
+                'url' => $url,
+                'like_count' => 0,
+                'dislike_count' => 1,
+            ]);
+        }
+    }
+
+    /**
+     * Get like and dislike
+     */
+    public function getNewsDetail($url)
+    {
+        $get_like = NewsLike::where('url', $url)->first();
+        return response()->json($get_like);
     }
 }

@@ -19,6 +19,7 @@ Route::get('/', function () {
 
 Auth::routes();
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-Route::get('/get-news', 'NewsController@displayNews');
-Route::post('/sourceId', 'NewsController@displayNews');
+// Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/', 'App\Http\Controllers\NewsController@displayNews');
+Route::get('/news', 'App\Http\Controllers\NewsController@fetchNews');
+Route::post('/sourceId', 'App\Http\Controllers\NewsController@displayNews');
